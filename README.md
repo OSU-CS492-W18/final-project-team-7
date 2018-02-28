@@ -7,7 +7,7 @@ A masterfully crafted Android application, with the main intent of pitting two c
 
 For the CS 492 class, Mobile Development, we have formed team 7:
 
-Griffin Gonsalves
-Drake Seifert
-Nathan Shepherd
-Alea Weeks
+* Griffin Gonsalves
+* Drake Seifert
+* Nathan Shepherd (shephern@oregonstate.edu)
+* Alea Weeks
