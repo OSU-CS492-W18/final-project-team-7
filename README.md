@@ -18,6 +18,8 @@ The [Cat API](http://thecatapi.com/ "The Cat API") allows cat loving developers 
 It references a database with easy to write queries and will return a selection of random cat image links.
 This API also has functionality to allow for favoriting and voting through other specific queries.
 
+api key: MjgxMDc3
+
 ## Team
 
 For the CS 492 class, Mobile Development, we have formed team 7:
