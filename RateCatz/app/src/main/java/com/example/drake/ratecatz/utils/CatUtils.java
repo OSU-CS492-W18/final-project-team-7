@@ -34,14 +34,8 @@ public class CatUtils {
     private static final String CAT_API_FORMAT_PARAM = "format";
     private static final String CAT_API_FORMAT = "xml";
     private static final String CAT_API_RESULTS_NUM_PARAM = "results_per_page";
-    private static final String CAT_API_RESULTS_NUM= "1";
+    private static final String CAT_API_RESULTS_NUM= "2";
 
-    public static class CatPhotoResults {
-        CatPhotos cats;
-    }
-    public static class CatPhotos {
-        CatPhoto[] cat;
-    }
 
     public static class CatPhoto implements Serializable {
         public String id;
@@ -64,6 +58,7 @@ public class CatUtils {
     // code influenced by: https://www.tutorialspoint.com/java_xml/java_dom_parse_document.htm
     public static ArrayList<CatPhoto> parseCatAPIGetImageResultXML(String catResultXML) throws IOException, SAXException {
         ArrayList<CatPhoto> catPhotoResultList = new ArrayList<>();
+        //CatPhoto catPhoto = new CatPhoto();
 
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
