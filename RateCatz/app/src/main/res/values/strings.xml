@@ -3,4 +3,6 @@
 
     <string name="action_favorites">Favorite Catz</string>
     <string name="action_settings">Settings</string>
+    
+    <string name="loading_error_message">Sorry, we cannot seem to generate cats for you. Check your internet connection.</string>
 </resources>
