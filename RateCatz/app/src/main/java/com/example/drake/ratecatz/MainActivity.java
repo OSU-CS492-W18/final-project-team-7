@@ -2,6 +2,7 @@ package com.example.drake.ratecatz;
 
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mCatPhotoTwoImageView;
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingErrorMessage;
+    private ImageView mFavoriteCatOneButton;
+    private ImageView mFavoriteCatTwoButton;
 
 
     @Override
@@ -61,6 +64,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        mFavoriteCatOneButton = (ImageView)findViewById(R.id.ic_favorite_cat_one);
+        mFavoriteCatTwoButton = (ImageView)findViewById(R.id.ic_favorite_cat_two);
+
+        mFavoriteCatOneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onFavorited(mFavoriteCatOneButton);
+            }
+        });
+
+
+        mFavoriteCatTwoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onFavorited(mFavoriteCatTwoButton);
+            }
+        });
+
         doCatGetImageRequest();
 
 
@@ -71,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
+    }
+
+    public void onFavorited(ImageView iv) {
+        iv.setImageResource(R.drawable.ic_favorited);
+
     }
 
     @Override
@@ -109,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute(){
             super.onPreExecute();
             mLoadingProgressBar.setVisibility(View.VISIBLE);
+            mCatPhotoTwoImageView.setVisibility(View.INVISIBLE);
+            mCatPhotoOneImageView.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -127,7 +156,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            mLoadingProgressBar.setVisibility(View.INVISIBLE);
+            mLoadingProgressBar.setVisibility(View.GONE);
+            mCatPhotoOneImageView.setVisibility(View.VISIBLE);
+            mCatPhotoTwoImageView.setVisibility(View.VISIBLE);
+
             if(s != null) {
                 try {
                     mCatPhotos = CatUtils.parseCatAPIGetImageResultXML(s);
@@ -159,4 +191,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }

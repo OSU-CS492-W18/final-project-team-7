@@ -23,42 +23,55 @@
             android:gravity="center"
             android:layout_gravity="fill_vertical">
 
-        <ProgressBar
-            android:id="@+id/pb_loading_indicator"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_margin="32dp"
-            android:layout_gravity="top|center_horizontal"
-            android:visibility="invisible"/>
+            <ProgressBar
+                android:id="@+id/pb_loading_indicator"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_margin="32dp"
+                android:layout_gravity="top|center_horizontal"
+                android:visibility="invisible"/>
 
-        <ImageView
-            android:id="@+id/iv_cat_photo_one"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:layout_weight="1"
-            android:padding="5dp"/>
 
-        <ImageView
-            android:id="@+id/iv_cat_photo_two"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:layout_weight="1"
-            android:padding="5dp"/>
+            <ImageView
+                android:id="@+id/iv_cat_photo_one"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:layout_weight="1"
+                android:padding="5dp" />
 
-        <TextView
-            android:id="@+id/tv_loading_error_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:padding="16dp"
-            android:visibility="invisible"
-            android:text="@string/loading_error_message" />
+            <ImageView
+                android:id="@+id/ic_favorite_cat_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_favorite"
+                android:scaleType="fitXY"/>
+
+            <ImageView
+                android:id="@+id/iv_cat_photo_two"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:layout_weight="1"
+                android:padding="5dp"/>
+
+            <ImageView
+                android:id="@+id/ic_favorite_cat_two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_favorite" />
+
+            <TextView
+                android:id="@+id/tv_loading_error_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:visibility="invisible"
+                android:text="@string/loading_error_message" />
 
 
         </LinearLayout>
