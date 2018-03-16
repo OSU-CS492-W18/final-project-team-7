@@ -1,11 +1,16 @@
 package com.example.drake.ratecatz;
 
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
@@ -16,10 +21,15 @@ import com.example.drake.ratecatz.utils.NetworkUtils;
 import org.xml.sax.SAXException;
 import com.bumptech.glide.Glide;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.view.View.OnTouchListener;
+import android.widget.Toast;
+
+import junit.framework.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLoadingErrorMessage;
     private ImageView mFavoriteCatOneButton;
     private ImageView mFavoriteCatTwoButton;
+    private SQLiteDatabase mDBW;
+    private SQLiteDatabase mDBR;
 
 
     @Override
@@ -64,24 +76,52 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        CatDBHelper dbWriteHelper = new CatDBHelper(this);
+        CatDBHelper dbReadHelper = new CatDBHelper(this);
+        mDBW = dbWriteHelper.getWritableDatabase();
+        mDBR = dbReadHelper.getReadableDatabase();
 
         mFavoriteCatOneButton = (ImageView)findViewById(R.id.ic_favorite_cat_one);
         mFavoriteCatTwoButton = (ImageView)findViewById(R.id.ic_favorite_cat_two);
 
-        mFavoriteCatOneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFavorited(mFavoriteCatOneButton);
-            }
-        });
+//        mFavoriteCatOneButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onFavorited(mFavoriteCatOneButton);
+//            }
+//        });
+//
+//
+//        mFavoriteCatTwoButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onFavorited(mFavoriteCatTwoButton);
+//            }
+//        });
+
+       mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
+
+           private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
+               @Override
+               public boolean onDoubleTap(MotionEvent e) {
+                   Log.d("TEST", "onDoubleTap");
+                   String favoritedText = "Added cat to favorites";
+                   Toast.makeText(mCatPhotoOneImageView.getContext(), favoritedText, Toast.LENGTH_SHORT).show();
+                   addCatToDB(mCatPhotos.get(0));
+                   return super.onDoubleTap(e);
+               }
+
+           });
+
+           @Override
+           public boolean onTouch(View v, MotionEvent event) {
+               Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+               gestureDetector.onTouchEvent(event);
+               return true;
+           }
 
 
-        mFavoriteCatTwoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFavorited(mFavoriteCatTwoButton);
-            }
-        });
+       });
 
         doCatGetImageRequest();
 
@@ -95,10 +135,12 @@ public class MainActivity extends AppCompatActivity {
         new CatImageFetchTask().execute(catImageUrl);
     }
 
-    public void onFavorited(ImageView iv) {
-        iv.setImageResource(R.drawable.ic_favorited);
-
-    }
+//    public void onFavorited(ImageView iv) {
+//        if(iv.getDrawable(R.drawable.ic_favorite) == R.drawable.ic_favorite) {
+//            iv.setImageResource(R.drawable.ic_favorited);
+//        }
+//
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,4 +234,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private long addCatToDB(CatUtils.CatPhoto cat) {
+        if( cat != null) {
+            ContentValues values = new ContentValues();
+            values.put(CatContract.FavoritedCats.COLUMN_CAT_URL, cat.url);
+            values.put(CatContract.FavoritedCats.COLUMN_CAT_ID, cat.id);
+            return mDBW.insert(CatContract.FavoritedCats.TABLE_NAME,null, values);
+        } else {
+            return -1;
+        }
+    }
+
+    private ArrayList<String> getAllCats(){
+        Cursor cursor = mDBR.query(
+                CatContract.FavoritedCats.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                CatContract.FavoritedCats.COLUMN_TIMESTAMP + " DESC"
+        );
+        ArrayList<String> favoriteCatList = new ArrayList<>();
+
+        cursor.moveToFirst();
+        do{
+            String url = cursor.getString(cursor.getColumnIndex(CatContract.FavoritedCats.COLUMN_CAT_URL));
+            favoriteCatList.add(url);
+        }while (cursor.moveToNext());
+
+        cursor.close();
+        return favoriteCatList;
+    }
 }
