@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mFavoriteCatTwoButton;
     private SQLiteDatabase mDBW;
     private SQLiteDatabase mDBR;
+    private ArrayList<String> mAllFavoritedCats;
 
 
     @Override
@@ -62,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
         mCatPhotoOneImageView = (ImageView)findViewById(R.id.iv_cat_photo_one);
         mCatPhotoTwoImageView = (ImageView)findViewById(R.id.iv_cat_photo_two);
 
-        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCatPhotoClicked();
-            }
-        });
+//        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onCatPhotoClicked();
+//            }
+//        });
 
         mCatPhotoTwoImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,37 +82,15 @@ public class MainActivity extends AppCompatActivity {
         mDBW = dbWriteHelper.getWritableDatabase();
         mDBR = dbReadHelper.getReadableDatabase();
 
-        mFavoriteCatOneButton = (ImageView)findViewById(R.id.ic_favorite_cat_one);
-        mFavoriteCatTwoButton = (ImageView)findViewById(R.id.ic_favorite_cat_two);
 
-//        mFavoriteCatOneButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onFavorited(mFavoriteCatOneButton);
-//            }
-//        });
-//
-//
-//        mFavoriteCatTwoButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onFavorited(mFavoriteCatTwoButton);
-//            }
-//        });
+        mAllFavoritedCats = getAllCats();
+        Log.d(TAG, "List of favorited cats in db: \n" );
+        for (int i=0;i<mAllFavoritedCats.size();i++)
+        {
+            Log.d(TAG,mAllFavoritedCats.get(i) + " onCreate()" );
+        }
 
        mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
-
-           private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
-               @Override
-               public boolean onDoubleTap(MotionEvent e) {
-                   Log.d("TEST", "onDoubleTap");
-                   String favoritedText = "Added cat to favorites";
-                   Toast.makeText(mCatPhotoOneImageView.getContext(), favoritedText, Toast.LENGTH_SHORT).show();
-                   addCatToDB(mCatPhotos.get(0));
-                   return super.onDoubleTap(e);
-               }
-
-           });
 
            @Override
            public boolean onTouch(View v, MotionEvent event) {
@@ -120,8 +99,71 @@ public class MainActivity extends AppCompatActivity {
                return true;
            }
 
+           private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
+               @Override
+               public boolean onDoubleTap(MotionEvent e) {
+                   Log.d("TEST", "onDoubleTap");
+                   if(!checkIfInFavorites(mCatPhotos.get(0).id)) {
+                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
+                       addCatToDB(mCatPhotos.get(0));
+                   } else {
+                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
+                       deleteCatFromFavorites(mCatPhotos.get(0).id);
+                   }
+                   return super.onDoubleTap(e);
+               }
+
+               @Override
+               public boolean onSingleTapUp(MotionEvent e) {
+                   return super.onSingleTapUp(e);
+               }
+
+               @Override
+               public boolean onSingleTapConfirmed(MotionEvent e) {
+                   onCatPhotoClicked();
+                   return super.onSingleTapConfirmed(e);
+               }
+           });
 
        });
+
+        
+        mCatPhotoTwoImageView.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+
+            private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    Log.d("TEST", "onDoubleTap");
+                    if(!checkIfInFavorites(mCatPhotos.get(1).id)) {
+                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
+                        addCatToDB(mCatPhotos.get(1));
+                    } else {
+                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
+                        deleteCatFromFavorites(mCatPhotos.get(1).id);
+                    }
+                    return super.onDoubleTap(e);
+                }
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return super.onSingleTapUp(e);
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    onCatPhotoClicked();
+                    return super.onSingleTapConfirmed(e);
+                }
+            });
+
+        });
 
         doCatGetImageRequest();
 
@@ -135,12 +177,13 @@ public class MainActivity extends AppCompatActivity {
         new CatImageFetchTask().execute(catImageUrl);
     }
 
-//    public void onFavorited(ImageView iv) {
-//        if(iv.getDrawable(R.drawable.ic_favorite) == R.drawable.ic_favorite) {
-//            iv.setImageResource(R.drawable.ic_favorited);
-//        }
-//
-//    }
+
+    @Override
+    protected void onDestroy() {
+        mDBR.close();
+        mDBW.close();
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -234,6 +277,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void deleteCatFromFavorites(String id) {
+        if(id != null) {
+            String sqlSelection = CatContract.FavoritedCats.COLUMN_CAT_ID + " = ?";
+            String[] sqlSelectionArgs = {id};
+            mDBW.delete(CatContract.FavoritedCats.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+        }
+    }
+
     private long addCatToDB(CatUtils.CatPhoto cat) {
         if( cat != null) {
             ContentValues values = new ContentValues();
@@ -243,6 +294,28 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return -1;
         }
+    }
+
+    private boolean checkIfInFavorites(String id) {
+        boolean isDuplicate = false;
+        if(id != null) {
+            String sqlSelection =
+                    CatContract.FavoritedCats.COLUMN_CAT_ID + " = ?";
+            String[] sqlSelectionArgs = {id};
+            Cursor cursor = mDBR.query(
+                    CatContract.FavoritedCats.TABLE_NAME,
+                    null,
+                    sqlSelection,
+                    sqlSelectionArgs,
+                    null,
+                    null,
+                    null
+            );
+
+            isDuplicate = cursor.getCount() > 0;
+            cursor.close();
+        }
+        return isDuplicate;
     }
 
     private ArrayList<String> getAllCats(){
