@@ -83,12 +83,12 @@ public class MainActivity extends AppCompatActivity {
         mDBR = dbReadHelper.getReadableDatabase();
 
 
-        mAllFavoritedCats = getAllCats();
-        Log.d(TAG, "List of favorited cats in db: \n" );
-        for (int i=0;i<mAllFavoritedCats.size();i++)
-        {
-            Log.d(TAG,mAllFavoritedCats.get(i) + " onCreate()" );
-        }
+//        mAllFavoritedCats = getAllCats();
+//        Log.d(TAG, "List of favorited cats in db: \n" );
+//        for (int i=0;i<mAllFavoritedCats.size();i++)
+//        {
+//            Log.d(TAG,mAllFavoritedCats.get(i) + " onCreate()" );
+//        }
 
        mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
 
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
        });
 
-        
+
         mCatPhotoTwoImageView.setOnTouchListener(new OnTouchListener() {
 
             @Override
