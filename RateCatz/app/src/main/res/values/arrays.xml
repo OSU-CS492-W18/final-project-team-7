@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_tag_list">
+        <item>all</item>
+        <item>hats</item>
+        <item>space</item>
+        <item>funny</item>
+        <item>sunglasses</item>
+        <item>boxes</item>
+        <item>caturday</item>
+        <item>ties</item>
+        <item>dream</item>
+        <item>kittens</item>
+        <item>sinks</item>
+        <item>clothes</item>
+    </string-array>
+
+</resources>

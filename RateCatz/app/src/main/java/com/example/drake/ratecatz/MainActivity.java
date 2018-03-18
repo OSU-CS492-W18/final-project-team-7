@@ -28,6 +28,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.view.View.OnTouchListener;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.app.Activity;
 
 import junit.framework.Test;
 

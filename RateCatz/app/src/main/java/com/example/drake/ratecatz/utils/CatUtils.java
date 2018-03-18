@@ -43,7 +43,7 @@ public class CatUtils {
         public String url;
     }
 
-
+    //adjust cat api to add list="$specified filter"
     public static String buildGetCatImagesURL() {
         return Uri.parse(CAT_API_GET_IMAGES_BASE_URL).buildUpon()
                 .appendQueryParameter(CAT_API_KEY_PARAM, CAT_API_KEY)
