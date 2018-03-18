@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
             addCatToDB(mCatPhotos.get(photoID));
 
-            catOverlay.setMaxWidth(catImageView.getWidth());
+            catOverlay.setMinimumWidth(catImageView.getWidth());
             catOverlay.setVisibility(View.VISIBLE);
             catOverlay.setImageDrawable(drawable);
             catOverlay.bringToFront();

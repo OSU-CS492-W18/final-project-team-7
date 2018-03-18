@@ -27,10 +27,13 @@
 
         <ImageView
             android:id="@+id/iv_cat_overlay_one"
-            android:layout_width="match_parent"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            android:tint="@color/colorAccent"
             android:visibility="invisible"/>
+
         <ImageView
             android:id="@+id/iv_cat_photo_one"
             android:layout_width="wrap_content"
@@ -50,10 +53,12 @@
 
         <ImageView
             android:id="@+id/iv_cat_overlay_two"
-            android:layout_width="match_parent"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:visibility="invisible"/>
+            android:tint="@color/colorAccent"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
 
         <ImageView
             android:id="@+id/iv_cat_photo_two"
