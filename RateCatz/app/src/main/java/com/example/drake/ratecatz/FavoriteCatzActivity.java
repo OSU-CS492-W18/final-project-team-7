@@ -15,10 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.drake.ratecatz.utils.CatUtils;
-
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class FavoriteCatzActivity extends AppCompatActivity
@@ -44,9 +40,9 @@ public class FavoriteCatzActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_catz);
 
-        mLoadingIndicatorPB = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-        mLoadingErrorMessageTV = (TextView) findViewById(R.id.tv_loading_error_message);
-        mPhotosRV = (RecyclerView) findViewById(R.id.rv_photos);
+        //mLoadingIndicatorPB = (ProgressBar)findViewById(R.id.pb_loading_indicator);
+        mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error_message);
+        mPhotosRV = (RecyclerView)findViewById(R.id.rv_photos);
 
         mAdapter = new FavoriteCatzAdapter(this);
         mPhotosRV.setAdapter(mAdapter);
@@ -54,8 +50,14 @@ public class FavoriteCatzActivity extends AppCompatActivity
         mPhotosRV.setHasFixedSize(true);
         mPhotosRV.setLayoutManager(new StaggeredGridLayoutManager(NUM_PHOTO_COLUMNS, StaggeredGridLayoutManager.VERTICAL));
 
-        mLoadingIndicatorPB.setVisibility(View.VISIBLE);
-        getSupportLoaderManager().initLoader(CAT_LOADER_ID, null, this);
+        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
+        //getSupportLoaderManager().initLoader(CAT_LOADER_ID, null, this);
+
+        mPhotos = getAllFavoritedCatz();
+        mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
+        for(CatUtils.CatPhoto photo : mPhotos) {
+            Log.d(TAG, "Got photo: " + photo.url);
+        }
     }
 
     public Loader<String> onCreateLoader(int id, Bundle args) {
@@ -69,6 +71,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mPhotosRV.setVisibility(View.VISIBLE);
             mPhotos = getAllFavoritedCatz();
+
             //Convert ArrayList<CatUtils.CatPhoto> to CatUtils.CatPhoto[]
             mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
             for(CatUtils.CatPhoto photo : mPhotos) {
