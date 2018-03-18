@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<CatUtils.CatPhoto> mCatPhotos;
     private ImageView mCatPhotoOneImageView;
     private ImageView mCatPhotoTwoImageView;
+    private ImageView mCatOverlayOneIV;
+    private ImageView mCatOverlayTwoIV;
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingErrorMessage;
     private ImageView mFavoriteCatOneButton;
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
         mCatPhotoOneImageView = (ImageView)findViewById(R.id.iv_cat_photo_one);
         mCatPhotoTwoImageView = (ImageView)findViewById(R.id.iv_cat_photo_two);
+
+        mCatOverlayOneIV = (ImageView)findViewById(R.id.iv_cat_overlay_one);
+        mCatOverlayTwoIV = (ImageView)findViewById(R.id.iv_cat_overlay_two);
 
 //        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -103,13 +108,7 @@ public class MainActivity extends AppCompatActivity {
                @Override
                public boolean onDoubleTap(MotionEvent e) {
                    Log.d("TEST", "onDoubleTap");
-                   if(!checkIfInFavorites(mCatPhotos.get(0).id)) {
-                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
-                       addCatToDB(mCatPhotos.get(0));
-                   } else {
-                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
-                       deleteCatFromFavorites(mCatPhotos.get(0).id);
-                   }
+                   onCatFavorite(0);
                    return super.onDoubleTap(e);
                }
 
@@ -147,13 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     Log.d("TEST", "onDoubleTap");
-                    if(!checkIfInFavorites(mCatPhotos.get(1).id)) {
-                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
-                        addCatToDB(mCatPhotos.get(1));
-                    } else {
-                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
-                        deleteCatFromFavorites(mCatPhotos.get(1).id);
-                    }
+                    onCatFavorite(1);
                     return super.onDoubleTap(e);
                 }
 
@@ -182,12 +175,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCatPhotoClicked() {
+        mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+        mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
     }
 
+    public void onCatFavorite(int photoID){
+        ImageView catImageView = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
+        ImageView catOverlay = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
 
+        if(!checkIfInFavorites(mCatPhotos.get(photoID).id)) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_favorite_overlay);
+            Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
+            addCatToDB(mCatPhotos.get(photoID));
+
+            catOverlay.setMaxWidth(catImageView.getWidth());
+            catOverlay.setVisibility(View.VISIBLE);
+            catOverlay.setImageDrawable(drawable);
+            catOverlay.bringToFront();
+
+        } else {
+            Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
+            deleteCatFromFavorites(mCatPhotos.get(photoID).id);
+
+            catOverlay.setVisibility(View.INVISIBLE);
+        }
+    }
     @Override
     protected void onDestroy() {
         mDBR.close();
@@ -220,6 +235,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doCatGetImageRequest() {
+        mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+        mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
