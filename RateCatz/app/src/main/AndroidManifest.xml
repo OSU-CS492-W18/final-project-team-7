@@ -18,19 +18,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FavoriteCatzActivity"
+        <activity
+            android:name=".FavoriteCatzActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.drake.ratecatz.MainActivity"/>
+                android:value="com.example.drake.ratecatz.MainActivity" />
         </activity>
-
-
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.drake.ratecatz.MainActivity"/>
+                android:value="com.example.drake.ratecatz.MainActivity" />
+        </activity>
+        <activity
+            android:name=".PhotoViewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_photo_view"
+            android:parentActivityName=".FavoriteCatzActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.drake.ratecatz.FavoriteCatzActivity" />
         </activity>
     </application>
 
