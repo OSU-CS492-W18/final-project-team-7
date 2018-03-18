@@ -1,6 +1,8 @@
 package com.example.drake.ratecatz;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +37,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
     //private CatUtils.CatPhoto[] mPhotos;
     private ArrayList<CatUtils.CatPhoto> mPhotos;
 
+    private SQLiteDatabase mDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,14 +68,8 @@ public class FavoriteCatzActivity extends AppCompatActivity
         if(data != null) {
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mPhotosRV.setVisibility(View.VISIBLE);
-            try {
-                mPhotos = CatUtils.parseCatAPIGetImageResultXML(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            }
-            //Convert Arraylist<CatUtils.CatPhoto> to CatUtils.CatPhoto[]
+            mPhotos = getAllFavoritedCatz();
+            //Convert ArrayList<CatUtils.CatPhoto> to CatUtils.CatPhoto[]
             mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
             for(CatUtils.CatPhoto photo : mPhotos) {
                 Log.d(TAG, "Got photo: " + photo.url);
@@ -94,5 +91,30 @@ public class FavoriteCatzActivity extends AppCompatActivity
         intent.putExtra(PhotoViewActivity.EXTRA_PHOTOS, mPhotos);
         intent.putExtra(PhotoViewActivity.EXTRA_PHOTO_IDX, photoIdx);
         startActivity(intent);
+    }
+
+    private ArrayList<CatUtils.CatPhoto> getAllFavoritedCatz() {
+        CatDBHelper dbHelper = new CatDBHelper(this);
+        mDB = dbHelper.getReadableDatabase();
+
+        Cursor cursor = mDB.query(
+                CatContract.FavoritedCats.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                CatContract.FavoritedCats.COLUMN_TIMESTAMP + " DESC"
+        );
+
+        ArrayList<CatUtils.CatPhoto> allFavoritedCatz = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            CatUtils.CatPhoto catPhoto = new CatUtils.CatPhoto();
+            catPhoto.url = cursor.getString(cursor.getColumnIndex(CatContract.FavoritedCats.COLUMN_CAT_URL));
+            catPhoto.id = cursor.getString(cursor.getColumnIndex(CatContract.FavoritedCats.COLUMN_CAT_ID));
+            allFavoritedCatz.add(catPhoto);
+        }
+        cursor.close();
+        return allFavoritedCatz;
     }
 }
