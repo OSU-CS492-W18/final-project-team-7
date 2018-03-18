@@ -12,7 +12,7 @@ import android.support.v14.preference.PreferenceFragment;
  * Created by gonzo on 3/17/2018.
  */
 
-public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals("pref_theme")) {
@@ -24,8 +24,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        EditTextPreference userPref = (EditTextPreference) findPreference(getString(R.string.pref_theme_title));
-        userPref.setSummary(userPref.getText());
+        //EditTextPreference userPref = (EditTextPreference) findPreference(getString(R.string.pref_theme_title));
+        //userPref.setSummary(userPref.getText());
     }
 
     @Override
