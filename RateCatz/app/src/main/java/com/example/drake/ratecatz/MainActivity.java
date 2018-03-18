@@ -70,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        mCatPhotoTwoImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCatPhotoClicked();
-            }
-        });
+//        mCatPhotoTwoImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onCatPhotoClicked();
+//            }
+//        });
 
         CatDBHelper dbWriteHelper = new CatDBHelper(this);
         CatDBHelper dbReadHelper = new CatDBHelper(this);
@@ -114,13 +114,19 @@ public class MainActivity extends AppCompatActivity {
                }
 
                @Override
+               public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                   onCatPhotoClicked();
+                   return super.onFling(e1, e2, velocityX, velocityY);
+               }
+
+               @Override
                public boolean onSingleTapUp(MotionEvent e) {
                    return super.onSingleTapUp(e);
                }
 
                @Override
                public boolean onSingleTapConfirmed(MotionEvent e) {
-                   onCatPhotoClicked();
+                 //  onCatPhotoClicked();
                    return super.onSingleTapConfirmed(e);
                }
            });
@@ -152,13 +158,19 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                    onCatPhotoClicked();
+                    return super.onFling(e1, e2, velocityX, velocityY);
+                }
+
+                @Override
                 public boolean onSingleTapUp(MotionEvent e) {
                     return super.onSingleTapUp(e);
                 }
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    onCatPhotoClicked();
+                   // onCatPhotoClicked();
                     return super.onSingleTapConfirmed(e);
                 }
             });
@@ -166,8 +178,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         doCatGetImageRequest();
-
-
 
     }
 
