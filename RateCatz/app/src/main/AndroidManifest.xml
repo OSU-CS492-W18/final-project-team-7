@@ -20,7 +20,8 @@
         </activity>
         <activity
             android:name=".FavoriteCatzActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:label="Favorite Catz">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.drake.ratecatz.MainActivity" />
