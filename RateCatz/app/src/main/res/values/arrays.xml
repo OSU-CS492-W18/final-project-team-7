@@ -14,5 +14,10 @@
         <item>sinks</item>
         <item>clothes</item>
     </string-array>
+    <string-array name="pref_themes">
+        <item>Black Cat</item>
+        <item>Tabby</item>
+        <item>Snowy White</item>
+    </string-array>
 
 </resources>
