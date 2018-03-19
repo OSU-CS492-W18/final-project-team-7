@@ -28,8 +28,7 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="Purrrfrences">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.drake.ratecatz.MainActivity" />
@@ -37,7 +36,7 @@
         <activity
             android:name=".PhotoViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="Kitty Cat Closeup"
+            android:label="@string/title_activity_photo_view"
             android:parentActivityName=".FavoriteCatzActivity"
             android:theme="@style/FullscreenTheme">
             <meta-data
