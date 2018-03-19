@@ -304,10 +304,10 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        //get user's tag pref here
 
         String pref_tag;
         pref_tag= sharedPreferences.getString("pref_tag", "none");
-
 
         mCatOverlayOneIV.setVisibility(View.INVISIBLE);
         mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
         Log.d(TAG, "pref_tag=" + pref_tag);
 
-
+        //adjust the url with tag here
        if (pref_tag.equals("none")){
             new CatImageFetchTask().execute((catImageUrl));
             Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
