@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
            public boolean onTouch(View v, MotionEvent event) {
                Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
                gestureDetector.onTouchEvent(event);
+               doCatGetImageRequest();
+
                return true;
            }
 
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
                 gestureDetector.onTouchEvent(event);
+                
                 return true;
             }
 
@@ -174,14 +177,14 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                   // onCatPhotoClicked();
+                    onCatPhotoClicked();
                     return super.onSingleTapConfirmed(e);
                 }
             });
 
         });
 
-        doCatGetImageRequest();
+
 
     }
 
@@ -233,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 getString(R.string.pref_tag_key),
                 getString(R.string.pref_tag_default)
         );
+
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "pref_tag= " + pref_tag);
 
