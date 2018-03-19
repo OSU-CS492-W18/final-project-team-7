@@ -8,7 +8,7 @@ Developed for CS 492, Rate Catz will have the following:
 3. HTTPS requests to a third-party API 
 	* Optionally send data back to the API
 4. Implement activity lifecycle methods to ensure clarity and flow
-5. Store user preferences (via SharedPreferences)
+5. Store favorite catz in a database using SQLite
 6. Polished and well-styled UI
 
 
