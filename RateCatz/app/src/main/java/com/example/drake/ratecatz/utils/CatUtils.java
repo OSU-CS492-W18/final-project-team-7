@@ -5,6 +5,8 @@ package com.example.drake.ratecatz.utils;
  */
 import android.net.Uri;
 import android.util.Log;
+import android.content.SharedPreferences;
+import android.content.Context;
 
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +37,9 @@ public class CatUtils {
     private static final String CAT_API_FORMAT = "xml";
     private static final String CAT_API_RESULTS_NUM_PARAM = "results_per_page";
     private static final String CAT_API_RESULTS_NUM= "2";
+    private static final String CAT_API_TAG_PARAM= "category";
+    private String CAT_API_TAG= ""; // no tags for default
+
 
 
     public static class CatPhoto implements Serializable {
@@ -45,10 +50,12 @@ public class CatUtils {
 
     //adjust cat api to add list="$specified filter"
     public static String buildGetCatImagesURL() {
+
         return Uri.parse(CAT_API_GET_IMAGES_BASE_URL).buildUpon()
                 .appendQueryParameter(CAT_API_KEY_PARAM, CAT_API_KEY)
                 .appendQueryParameter(CAT_API_FORMAT_PARAM, CAT_API_FORMAT)
                 .appendQueryParameter(CAT_API_RESULTS_NUM_PARAM, CAT_API_RESULTS_NUM)
+                //.appendQueryParameter(CAT_API_TAG_PARAM, CAT_API_TAG)
                 .build()
                 .toString();
     }
