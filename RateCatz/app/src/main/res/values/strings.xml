@@ -10,7 +10,7 @@
     <string name="pref_theme_desc">Color Preferences</string>
     <string name="pref_tag_title">Tag Preferences</string>
     <string name="pref_tag_desc">Additional cat parameters</string>
-    <string name="pref_tag_default">hats</string>
+    <string name="pref_tag_default">none</string>
 
     <string name="loading_error_message">Sorry, we cannot seem to generate cats for you. Check your internet connection.</string>
 </resources>

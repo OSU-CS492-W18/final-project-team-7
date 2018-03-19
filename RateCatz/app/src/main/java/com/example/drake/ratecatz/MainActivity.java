@@ -186,9 +186,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCatPhotoClicked() {
-        String catImageUrl = CatUtils.buildGetCatImagesURL();
+        doCatGetImageRequest();
+        /*String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
+        */
     }
 
 
@@ -232,15 +234,19 @@ public class MainActivity extends AppCompatActivity {
                 getString(R.string.pref_tag_default)
         );
         String catImageUrl = CatUtils.buildGetCatImagesURL();
+        Log.d(TAG, "pref_tag= " + pref_tag);
 
 
+        if (pref_tag.equals("none")){
+            new CatImageFetchTask().execute((catImageUrl));
+            Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
+        }
+        else{
+            catImageUrl = catImageUrl + "&category=" + pref_tag;
+            Log.d(TAG, "doCatImageRequest building URL2: " + catImageUrl);
+            new CatImageFetchTask().execute((catImageUrl));
+        }
 
-
-        Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
-        catImageUrl = catImageUrl + "&category=" + pref_tag;
-        Log.d(TAG, "doCatImageRequest building URL2: " + catImageUrl);
-
-        new CatImageFetchTask().execute((catImageUrl));
     }
 
     public class CatImageFetchTask extends AsyncTask<String, Void, String> {
