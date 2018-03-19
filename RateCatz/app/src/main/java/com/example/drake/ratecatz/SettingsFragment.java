@@ -21,6 +21,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }*/
     }
      //adjust things if necessary
+    //**themes can only change on activity start**
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -32,6 +33,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
+        //load prefs layout page
     }
     @Override
     public void onResume() {
