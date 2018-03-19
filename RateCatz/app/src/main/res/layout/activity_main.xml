@@ -10,7 +10,6 @@
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="fill_vertical">
-
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_width="72dp"
@@ -37,14 +36,12 @@
 
         <ImageView
             android:id="@+id/iv_cat_photo_one"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            android:background="@color/colorPrimaryDark"
             android:layout_gravity="center"
             android:padding="5dp" />
-
     </FrameLayout>
 
     <FrameLayout
@@ -65,13 +62,12 @@
 
         <ImageView
             android:id="@+id/iv_cat_photo_two"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:padding="5dp"/>
-
     </FrameLayout>
 
     <TextView

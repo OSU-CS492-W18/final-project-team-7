@@ -1,6 +1,10 @@
 package com.example.drake.ratecatz;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +12,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.SystemClock;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
@@ -25,6 +32,8 @@ import com.bumptech.glide.Glide;
 
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -186,20 +195,51 @@ public class MainActivity extends AppCompatActivity {
     public void onCatPhotoClicked(int photoID, float velocity) {
 
         ImageView imageChosen = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
-        FrameLayout frameLayoutDisregarded = (photoID != 0)?mImageFrameOne:mImageFrameTwo;
+        ImageView overlayChosen = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
+        float distance = (velocity > 0)?1400f:-1400f;
 
-        //mCatOverlayOneIV.setVisibility(View.INVISIBLE);
-        //mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
-        FlingAnimation flingAnimation = new FlingAnimation(imageChosen, DynamicAnimation.TRANSLATION_X);
-        flingAnimation.setStartVelocity(velocity)
-                .setMinValue(0)
-                .setMaxValue(100)
-                .setFriction(1.1f)
-                .start();
+        final AnimatorSet animatorSet = new AnimatorSet();
 
-        String catImageUrl = CatUtils.buildGetCatImagesURL();
-        Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
-        new CatImageFetchTask().execute(catImageUrl);
+
+        ObjectAnimator animation = ObjectAnimator.ofFloat(imageChosen, "translationX", distance);
+        animation.setDuration(140);
+        ObjectAnimator animationOverlay = ObjectAnimator.ofFloat(overlayChosen, "translationX", distance);
+        animationOverlay.setDuration(140);
+        animatorSet.play(animation).with(animationOverlay);
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                mCatPhotoOneImageView.clearAnimation();
+                mCatPhotoTwoImageView.clearAnimation();
+                mCatOverlayOneIV.clearAnimation();
+                mCatOverlayTwoIV.clearAnimation();
+
+                animation.removeListener(this);
+                animation.setDuration(0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    ((AnimatorSet) animation).reverse();
+                }
+                animation.cancel();
+
+                String catImageUrl = CatUtils.buildGetCatImagesURL();
+                Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
+                new CatImageFetchTask().execute(catImageUrl);
+            }
+        });
+        animatorSet.start();
+
+
+//
+//        imageChosen.setVisibility(View.INVISIBLE);
+//        imageChosen.clearAnimation();
+//        animatorSet.cancel();
+//        String catImageUrl = CatUtils.buildGetCatImagesURL();
+//        Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
+//        new CatImageFetchTask().execute(catImageUrl);
+//        imageChosen.setVisibility(View.VISIBLE);
     }
 
     public void onCatFavorite(int photoID){
@@ -223,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
             catOverlay.setVisibility(View.INVISIBLE);
         }
     }
+
     @Override
     protected void onDestroy() {
         mDBR.close();
