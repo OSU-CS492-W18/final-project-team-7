@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.animation.DynamicAnimation;
+import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -23,6 +25,7 @@ import com.bumptech.glide.Glide;
 
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mCatPhotoTwoImageView;
     private ImageView mCatOverlayOneIV;
     private ImageView mCatOverlayTwoIV;
+    private FrameLayout mImageFrameOne;
+    private FrameLayout mImageFrameTwo;
+
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingErrorMessage;
     private ImageView mFavoriteCatOneButton;
@@ -67,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
         mCatOverlayOneIV = (ImageView)findViewById(R.id.iv_cat_overlay_one);
         mCatOverlayTwoIV = (ImageView)findViewById(R.id.iv_cat_overlay_two);
+
+        mImageFrameOne = (FrameLayout)findViewById(R.id.fl_image_one);
+        mImageFrameTwo = (FrameLayout)findViewById(R.id.fl_image_two);
 
 //        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -114,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
                @Override
                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                   onCatPhotoClicked();
+                   onCatPhotoClicked(0, velocityX);
                    return super.onFling(e1, e2, velocityX, velocityY);
                }
 
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    onCatPhotoClicked();
+                    onCatPhotoClicked(1, velocityX);
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
 
@@ -174,9 +183,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onCatPhotoClicked() {
-        mCatOverlayOneIV.setVisibility(View.INVISIBLE);
-        mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+    public void onCatPhotoClicked(int photoID, float velocity) {
+
+        ImageView imageChosen = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
+        FrameLayout frameLayoutDisregarded = (photoID != 0)?mImageFrameOne:mImageFrameTwo;
+
+        //mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+        //mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+        FlingAnimation flingAnimation = new FlingAnimation(imageChosen, DynamicAnimation.TRANSLATION_X);
+        flingAnimation.setStartVelocity(velocity)
+                .setMinValue(0)
+                .setMaxValue(100)
+                .setFriction(1.1f)
+                .start();
+
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);

@@ -20,6 +20,7 @@
         android:visibility="invisible"/>
 
     <FrameLayout
+        android:id="@+id/fl_image_one"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -40,12 +41,14 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
+            android:background="@color/colorPrimaryDark"
             android:layout_gravity="center"
             android:padding="5dp" />
 
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/fl_image_two"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
