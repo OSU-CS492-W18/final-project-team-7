@@ -39,8 +39,12 @@ public class CatUtils {
     private static final String CAT_API_RESULTS_NUM= "2";
     private static final String CAT_API_TAG_PARAM= "category";
     private String CAT_API_TAG= ""; // no tags for default
+    Context mContext;
 
-
+   /* public void getTagPref(Context mContext) {
+        SharedPreferences sharedPref = mContext.getSharedPreferences(
+                getString(R.string.pref_tag), Context.MODE_PRIVATE);
+    }*/
 
     public static class CatPhoto implements Serializable {
         public String id;
