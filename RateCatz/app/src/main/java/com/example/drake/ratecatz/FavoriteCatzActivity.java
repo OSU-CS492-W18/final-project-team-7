@@ -22,7 +22,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
         implements FavoriteCatzAdapter.OnPhotoItemClickedListener {
 
     private static final String TAG = FavoriteCatzActivity.class.getSimpleName();
-    private static final int CAT_LOADER_ID = 0;
+    //private static final int CAT_LOADER_ID = 0;
     private static final int NUM_PHOTO_COLUMNS = 2;
 
     private RecyclerView mPhotosRV;
