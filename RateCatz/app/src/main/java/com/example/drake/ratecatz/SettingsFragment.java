@@ -2,10 +2,11 @@ package com.example.drake.ratecatz;
 
 import android.os.Bundle;
 import android.content.SharedPreferences;
-import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v14.preference.PreferenceFragment;
 
+import java.util.List;
 
 
 /**
@@ -15,9 +16,9 @@ import android.support.v14.preference.PreferenceFragment;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-     /*   if (key.equals("pref_theme")) {
-            EditTextPreference themePref = (EditTextPreference)findPreference(key);
-            themePref.setSummary(themePref.getText());
+       /* if (key.equals("pref_tag")) {
+            ListPreference tagPref = (ListPreference)findPreference(key);
+            tagPref.setValue(tagPref.getText());
         }*/
     }
      //adjust things if necessary

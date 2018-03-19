@@ -18,6 +18,7 @@ import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.ListPreference;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
            public boolean onTouch(View v, MotionEvent event) {
                Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
                gestureDetector.onTouchEvent(event);
-               doCatGetImageRequest();
+               //doCatGetImageRequest();
 
                return true;
            }
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    onCatPhotoClicked();
+                    //
                     return super.onSingleTapConfirmed(e);
                 }
             });
@@ -199,16 +200,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-<<<<<<< HEAD
+/*
     public void onCatPhotoClicked() {
         doCatGetImageRequest();
         /*String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
         */
-=======
-    public void onCatPhotoClicked(int photoID, float velocity) {
 
+    public void onCatPhotoClicked(int photoID, float velocity) {
+        doCatGetImageRequest();
         ImageView imageChosen = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
         ImageView overlayChosen = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
         float distance = (velocity > 0)?1400f:-1400f;
@@ -239,13 +240,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 animation.cancel();
 
-                String catImageUrl = CatUtils.buildGetCatImagesURL();
-                Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
-                new CatImageFetchTask().execute(catImageUrl);
+
             }
         });
         animatorSet.start();
->>>>>>> master
+        //doCatGetImageRequest();
     }
 
     public void onCatFavorite(int photoID){
@@ -302,28 +301,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doCatGetImageRequest() {
-<<<<<<< HEAD
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String pref_tag;
-        pref_tag= sharedPreferences.getString(
-                getString(R.string.pref_tag_key),
-                getString(R.string.pref_tag_default)
-        );
 
-=======
+        String pref_tag;
+        pref_tag= sharedPreferences.getString("pref_tag", "none");
+
+
         mCatOverlayOneIV.setVisibility(View.INVISIBLE);
         mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
->>>>>>> master
+
         String catImageUrl = CatUtils.buildGetCatImagesURL();
-        Log.d(TAG, "pref_tag= " + pref_tag);
+        new CatImageFetchTask().execute((catImageUrl));
+        Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
+        Log.d(TAG, "pref_tag=" + pref_tag);
 
 
-        if (pref_tag.equals("none")){
+       if (pref_tag.equals("none")){
             new CatImageFetchTask().execute((catImageUrl));
             Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
-        }
-        else{
+        } else{
             catImageUrl = catImageUrl + "&category=" + pref_tag;
             Log.d(TAG, "doCatImageRequest building URL2: " + catImageUrl);
             new CatImageFetchTask().execute((catImageUrl));
