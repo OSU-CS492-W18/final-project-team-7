@@ -1,16 +1,25 @@
 package com.example.drake.ratecatz;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.SystemClock;
+import android.support.animation.DynamicAnimation;
+import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
@@ -23,6 +32,9 @@ import com.bumptech.glide.Glide;
 
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<CatUtils.CatPhoto> mCatPhotos;
     private ImageView mCatPhotoOneImageView;
     private ImageView mCatPhotoTwoImageView;
+    private ImageView mCatOverlayOneIV;
+    private ImageView mCatOverlayTwoIV;
+    private FrameLayout mImageFrameOne;
+    private FrameLayout mImageFrameTwo;
+
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingErrorMessage;
     private ImageView mFavoriteCatOneButton;
@@ -62,6 +79,12 @@ public class MainActivity extends AppCompatActivity {
 
         mCatPhotoOneImageView = (ImageView)findViewById(R.id.iv_cat_photo_one);
         mCatPhotoTwoImageView = (ImageView)findViewById(R.id.iv_cat_photo_two);
+
+        mCatOverlayOneIV = (ImageView)findViewById(R.id.iv_cat_overlay_one);
+        mCatOverlayTwoIV = (ImageView)findViewById(R.id.iv_cat_overlay_two);
+
+        mImageFrameOne = (FrameLayout)findViewById(R.id.fl_image_one);
+        mImageFrameTwo = (FrameLayout)findViewById(R.id.fl_image_two);
 
 //        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -103,19 +126,13 @@ public class MainActivity extends AppCompatActivity {
                @Override
                public boolean onDoubleTap(MotionEvent e) {
                    Log.d("TEST", "onDoubleTap");
-                   if(!checkIfInFavorites(mCatPhotos.get(0).id)) {
-                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
-                       addCatToDB(mCatPhotos.get(0));
-                   } else {
-                       Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
-                       deleteCatFromFavorites(mCatPhotos.get(0).id);
-                   }
+                   onCatFavorite(0);
                    return super.onDoubleTap(e);
                }
 
                @Override
                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                   onCatPhotoClicked();
+                   onCatPhotoClicked(0, velocityX);
                    return super.onFling(e1, e2, velocityX, velocityY);
                }
 
@@ -147,19 +164,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     Log.d("TEST", "onDoubleTap");
-                    if(!checkIfInFavorites(mCatPhotos.get(1).id)) {
-                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
-                        addCatToDB(mCatPhotos.get(1));
-                    } else {
-                        Toast.makeText(mCatPhotoTwoImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
-                        deleteCatFromFavorites(mCatPhotos.get(1).id);
-                    }
+                    onCatFavorite(1);
                     return super.onDoubleTap(e);
                 }
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    onCatPhotoClicked();
+                    onCatPhotoClicked(1, velocityX);
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
 
@@ -181,12 +192,67 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onCatPhotoClicked() {
-        String catImageUrl = CatUtils.buildGetCatImagesURL();
-        Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
-        new CatImageFetchTask().execute(catImageUrl);
+    public void onCatPhotoClicked(int photoID, float velocity) {
+
+        ImageView imageChosen = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
+        ImageView overlayChosen = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
+        float distance = (velocity > 0)?1400f:-1400f;
+
+        final AnimatorSet animatorSet = new AnimatorSet();
+
+
+        ObjectAnimator animation = ObjectAnimator.ofFloat(imageChosen, "translationX", distance);
+        animation.setDuration(140);
+        ObjectAnimator animationOverlay = ObjectAnimator.ofFloat(overlayChosen, "translationX", distance);
+        animationOverlay.setDuration(140);
+        animatorSet.play(animation).with(animationOverlay);
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                mCatPhotoOneImageView.clearAnimation();
+                mCatPhotoTwoImageView.clearAnimation();
+                mCatOverlayOneIV.clearAnimation();
+                mCatOverlayTwoIV.clearAnimation();
+
+                animation.removeListener(this);
+                animation.setDuration(0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    ((AnimatorSet) animation).reverse();
+                }
+                animation.cancel();
+
+                String catImageUrl = CatUtils.buildGetCatImagesURL();
+                Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
+                new CatImageFetchTask().execute(catImageUrl);
+            }
+        });
+        animatorSet.start();
     }
 
+    public void onCatFavorite(int photoID){
+        ImageView catImageView = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
+        ImageView catOverlay = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
+
+        if(!checkIfInFavorites(mCatPhotos.get(photoID).id)) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_favorite_overlay);
+            Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
+            addCatToDB(mCatPhotos.get(photoID));
+
+            catOverlay.setMinimumWidth(catImageView.getWidth());
+            catOverlay.setVisibility(View.VISIBLE);
+            catOverlay.setImageDrawable(drawable);
+            catOverlay.bringToFront();
+
+        } else {
+            Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
+            deleteCatFromFavorites(mCatPhotos.get(photoID).id);
+
+            catOverlay.setVisibility(View.INVISIBLE);
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -220,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doCatGetImageRequest() {
+        mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+        mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
         new CatImageFetchTask().execute(catImageUrl);
