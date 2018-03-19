@@ -230,16 +230,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         animatorSet.start();
-
-
-//
-//        imageChosen.setVisibility(View.INVISIBLE);
-//        imageChosen.clearAnimation();
-//        animatorSet.cancel();
-//        String catImageUrl = CatUtils.buildGetCatImagesURL();
-//        Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
-//        new CatImageFetchTask().execute(catImageUrl);
-//        imageChosen.setVisibility(View.VISIBLE);
     }
 
     public void onCatFavorite(int photoID){
