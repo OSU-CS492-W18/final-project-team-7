@@ -18,11 +18,11 @@ import com.example.drake.ratecatz.utils.CatUtils;
 import java.util.ArrayList;
 
 public class FavoriteCatzActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String>,
-        FavoriteCatzAdapter.OnPhotoItemClickedListener {
+        //implements LoaderManager.LoaderCallbacks<String>,
+        implements FavoriteCatzAdapter.OnPhotoItemClickedListener {
 
     private static final String TAG = FavoriteCatzActivity.class.getSimpleName();
-    private static final int CAT_LOADER_ID = 0;
+    //private static final int CAT_LOADER_ID = 0;
     private static final int NUM_PHOTO_COLUMNS = 2;
 
     private RecyclerView mPhotosRV;
@@ -60,7 +60,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
         }
     }
 
-    public Loader<String> onCreateLoader(int id, Bundle args) {
+    /*public Loader<String> onCreateLoader(int id, Bundle args) {
         return new FavoriteCatzLoader(this);
     }
 
@@ -86,7 +86,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<String> loader) {
         //Nothing
-    }
+    }*/
 
     @Override
     public void onPhotoItemClicked(int photoIdx) {
