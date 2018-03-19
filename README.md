@@ -1,6 +1,6 @@
 # Rate Catz
 
-A masterfully crafted Android application, with the main intent of pitting two cats against each other, in a randomized rating roulette.
+A masterfully crafted Android application with the main intent of pitting two cats against each other in a randomized rating roulette.
 Developed for CS 492, Rate Catz will have the following:
 
 1. Multiple activities
