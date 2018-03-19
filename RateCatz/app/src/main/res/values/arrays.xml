@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_tag_list">
-        <item>all</item>
+        <item>none</item>
         <item>hats</item>
         <item>space</item>
         <item>funny</item>

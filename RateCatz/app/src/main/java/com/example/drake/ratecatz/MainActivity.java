@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.view.View.OnTouchListener;
 import android.widget.Toast;
 import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
 import android.os.Bundle;
 import android.app.Activity;
 
@@ -223,9 +224,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doCatGetImageRequest() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String pref_tag;
+        pref_tag= sharedPreferences.getString(
+                getString(R.string.pref_tag_key),
+                getString(R.string.pref_tag_default)
+        );
         String catImageUrl = CatUtils.buildGetCatImagesURL();
+
+
+
+
         Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
-        new CatImageFetchTask().execute(catImageUrl);
+        catImageUrl = catImageUrl + "&category=" + pref_tag;
+        Log.d(TAG, "doCatImageRequest building URL2: " + catImageUrl);
+
+        new CatImageFetchTask().execute((catImageUrl));
     }
 
     public class CatImageFetchTask extends AsyncTask<String, Void, String> {
