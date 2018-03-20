@@ -22,9 +22,13 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
 
     private CatUtils.CatPhoto[] mPhotos;
     private OnPhotoItemClickedListener mOnPhotoItemClickedListener;
+    private OnPhotoItemLongClickedListener mOnPhotoItemLongClickedListener;
 
-    public FavoriteCatzAdapter(OnPhotoItemClickedListener clickedListener) {
+
+    public FavoriteCatzAdapter(OnPhotoItemClickedListener clickedListener, OnPhotoItemLongClickedListener longClickedListener) {
         mOnPhotoItemClickedListener = clickedListener;
+        mOnPhotoItemLongClickedListener = longClickedListener;
+
     }
 
     public void updatePhotos(CatUtils.CatPhoto[] photos) {
@@ -57,13 +61,18 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
         void onPhotoItemClicked(int photoIdx);
     }
 
-    class CatPhotoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public interface OnPhotoItemLongClickedListener {
+        void onPhotoItemLongClicked(int photoIndex);
+    }
+
+    class CatPhotoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private ImageView mPhotoIV;
 
         public CatPhotoViewHolder(View itemView) {
             super(itemView);
             mPhotoIV = itemView.findViewById(R.id.iv_cat_photo); //TODO verify this is correct
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void bind(CatUtils.CatPhoto photo) {
@@ -76,6 +85,16 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
                     .apply(RequestOptions.placeholderOf(new SizedColorDrawable(Color.WHITE, photo.width_m, photo.height_m)))
                     .into(mPhotoIV);
             */
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            //Log.v("long clicked","pos: " + getAdapterPosition());
+            mOnPhotoItemLongClickedListener.onPhotoItemLongClicked(getAdapterPosition());
+
+//                    FavoriteCatzActivity.deleteCatFromFavorites(mPhotos[getAdapterPosition()].id);
+//                    Toast.makeText(itemView.getContext(), "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
+            return true;
         }
 
         @Override
