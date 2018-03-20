@@ -110,11 +110,10 @@ public class PhotoViewActivity extends AppCompatActivity {
         // I'm not really sure how the pager works
         Intent intent = getIntent();
         mURL = "null";
-        int idx = -1;
+        int idx = mPager.getCurrentItem();
         if (intent != null && intent.hasExtra(EXTRA_PHOTOS)){
             ArrayList<CatUtils.CatPhoto> photos =
                     (ArrayList<CatUtils.CatPhoto>)intent.getSerializableExtra(EXTRA_PHOTOS);
-            idx = intent.getIntExtra(EXTRA_PHOTO_IDX, 0);
             mURL = photos.get(idx).url;
         }
         String shareText = "Check out this awesome cat from RateCatz! " + mURL;//need to add cat URL To share here
