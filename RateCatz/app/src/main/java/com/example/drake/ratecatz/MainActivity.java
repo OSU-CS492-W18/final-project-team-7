@@ -5,9 +5,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -46,19 +48,18 @@ import junit.framework.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CAT_LOADER_ID = 1;
     private static final String CAT_URL_KEY = "catUrl";
+
     private static final int NUM_PHOTO_COLUMNS = 2;
     private ArrayList<CatUtils.CatPhoto> mCatPhotos;
     private ImageView mCatPhotoOneImageView;
     private ImageView mCatPhotoTwoImageView;
     private ImageView mCatOverlayOneIV;
     private ImageView mCatOverlayTwoIV;
-    private FrameLayout mImageFrameOne;
-    private FrameLayout mImageFrameTwo;
 
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingErrorMessage;
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase mDBW;
     private SQLiteDatabase mDBR;
     private ArrayList<String> mAllFavoritedCats;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
         mCatOverlayOneIV = (ImageView)findViewById(R.id.iv_cat_overlay_one);
         mCatOverlayTwoIV = (ImageView)findViewById(R.id.iv_cat_overlay_two);
-
-        mImageFrameOne = (FrameLayout)findViewById(R.id.fl_image_one);
-        mImageFrameTwo = (FrameLayout)findViewById(R.id.fl_image_two);
 
 //        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -188,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        doCatGetImageRequest();
+        doCatGetImageRequest(true);
 
     }
 
@@ -226,10 +223,11 @@ public class MainActivity extends AppCompatActivity {
 
                 String catImageUrl = CatUtils.buildGetCatImagesURL();
                 Log.d(TAG, "doCatImageRequest building another URL: " + catImageUrl);
-                new CatImageFetchTask().execute(catImageUrl);
+                doCatGetImageRequest(false);
             }
         });
         animatorSet.start();
+
     }
 
     public void onCatFavorite(int photoID){
@@ -285,74 +283,80 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void doCatGetImageRequest() {
+    private void doCatGetImageRequest(boolean initialLoad) {
         mCatOverlayOneIV.setVisibility(View.INVISIBLE);
         mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
+
+        mCatPhotoTwoImageView.setVisibility(View.INVISIBLE);
+        mCatPhotoOneImageView.setVisibility(View.INVISIBLE);
+
         String catImageUrl = CatUtils.buildGetCatImagesURL();
         Log.d(TAG, "doCatImageRequest building URL: " + catImageUrl);
-        new CatImageFetchTask().execute(catImageUrl);
+
+        Bundle loaderArgs = new Bundle();
+        loaderArgs.putString(CAT_URL_KEY, catImageUrl);
+        LoaderManager loaderManager = getLoaderManager();
+
+        if(initialLoad) {
+            loaderManager.initLoader(CAT_LOADER_ID, loaderArgs, this);
+        } else {
+            loaderManager.restartLoader(CAT_LOADER_ID, loaderArgs, this);
+        }
     }
 
-    public class CatImageFetchTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-            mLoadingProgressBar.setVisibility(View.VISIBLE);
-            mCatPhotoTwoImageView.setVisibility(View.INVISIBLE);
-            mCatPhotoOneImageView.setVisibility(View.INVISIBLE);
+    @Override
+    public Loader<String> onCreateLoader(int i, Bundle args) {
+        String catURL = null;
+        if (args != null) {
+            catURL = args.getString(CAT_URL_KEY);
         }
+        return new MainActivityLoader(this, catURL);
+    }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            String catRequestURL = strings[0];
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data) {
+        Log.d(TAG, "got XML from loader");
+        mLoadingProgressBar.setVisibility(View.GONE);
 
-            String catResults = null;
+        if(data != null) {
+            try {
+                mCatPhotoOneImageView.setVisibility(View.VISIBLE);
+                mCatPhotoTwoImageView.setVisibility(View.VISIBLE);
 
-            try{
-                catResults = NetworkUtils.doHTTPGet(catRequestURL);
-            } catch(IOException e) {
+                mCatPhotos = CatUtils.parseCatAPIGetImageResultXML(data);
+                CatUtils.CatPhoto catPhoto1;
+                CatUtils.CatPhoto catPhoto2;
+
+                catPhoto1 = mCatPhotos.get(0);
+                catPhoto2 = mCatPhotos.get(1);
+
+                Glide.with(mCatPhotoOneImageView.getContext())
+                        .load(catPhoto1.url)
+                        .into(mCatPhotoOneImageView);
+
+                Glide.with(mCatPhotoTwoImageView.getContext())
+                        .load(catPhoto2.url)
+                        .into(mCatPhotoTwoImageView);
+
+                for(CatUtils.CatPhoto photo : mCatPhotos) {
+                    Log.d(TAG, "Got photo " + photo.url);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
                 e.printStackTrace();
             }
-            return catResults;
+
+        } else {
+            mLoadingErrorMessage.setVisibility(View.VISIBLE);
         }
+    }
 
-        @Override
-        protected void onPostExecute(String s) {
-            mLoadingProgressBar.setVisibility(View.GONE);
-            mCatPhotoOneImageView.setVisibility(View.VISIBLE);
-            mCatPhotoTwoImageView.setVisibility(View.VISIBLE);
-
-            if(s != null) {
-                try {
-                    mCatPhotos = CatUtils.parseCatAPIGetImageResultXML(s);
-                    CatUtils.CatPhoto catPhoto1 = new CatUtils.CatPhoto();
-                    CatUtils.CatPhoto catPhoto2 = new CatUtils.CatPhoto();
-
-                    catPhoto1 = mCatPhotos.get(0);
-                    catPhoto2 = mCatPhotos.get(1);
-
-                    Glide.with(mCatPhotoOneImageView.getContext())
-                    .load(catPhoto1.url)
-                    .into(mCatPhotoOneImageView);
-
-                    Glide.with(mCatPhotoTwoImageView.getContext())
-                            .load(catPhoto2.url)
-                            .into(mCatPhotoTwoImageView);
-
-                    for(CatUtils.CatPhoto photo : mCatPhotos) {
-                        Log.d(TAG, "Got photo" + photo.url);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (SAXException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                mLoadingErrorMessage.setVisibility(View.VISIBLE);
-            }
-        }
+    @Override
+    public void onLoaderReset(Loader<String> loader) {
+        // Not a thing, I suppose
     }
 
     private void deleteCatFromFavorites(String id) {
