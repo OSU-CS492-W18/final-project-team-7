@@ -13,13 +13,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.drake.ratecatz.utils.CatUtils;
 import java.util.ArrayList;
 
 public class FavoriteCatzActivity extends AppCompatActivity
         //implements LoaderManager.LoaderCallbacks<String>,
-        implements FavoriteCatzAdapter.OnPhotoItemClickedListener {
+        implements FavoriteCatzAdapter.OnPhotoItemClickedListener, FavoriteCatzAdapter.OnPhotoItemLongClickedListener {
 
     private static final String TAG = FavoriteCatzActivity.class.getSimpleName();
     //private static final int CAT_LOADER_ID = 0;
@@ -44,7 +45,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error_message);
         mPhotosRV = (RecyclerView)findViewById(R.id.rv_photos);
 
-        mAdapter = new FavoriteCatzAdapter(this);
+        mAdapter = new FavoriteCatzAdapter(this, this);
         mPhotosRV.setAdapter(mAdapter);
 
         mPhotosRV.setHasFixedSize(true);
@@ -119,5 +120,21 @@ public class FavoriteCatzActivity extends AppCompatActivity
         }
         cursor.close();
         return allFavoritedCatz;
+    }
+
+    public void deleteCatFromFavorites(String id) {
+        CatDBHelper dbHelper = new CatDBHelper(this);
+        mDB = dbHelper.getReadableDatabase();
+        if(id != null) {
+            String sqlSelection = CatContract.FavoritedCats.COLUMN_CAT_ID + " = ?";
+            String[] sqlSelectionArgs = {id};
+            mDB.delete(CatContract.FavoritedCats.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+        }
+    }
+
+    @Override
+    public void onPhotoItemLongClicked(int photo) {
+        Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
+        deleteCatFromFavorites(mPhotos.get(photo).id);
     }
 }
