@@ -2,6 +2,7 @@ package com.example.drake.ratecatz;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +11,13 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
 import com.example.drake.ratecatz.utils.CatUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -24,7 +27,7 @@ import java.util.ArrayList;
 public class PhotoViewActivity extends AppCompatActivity {
     public static final String EXTRA_PHOTOS = "photos";
     public static final String EXTRA_PHOTO_IDX = "photoIdx";
-
+    private String mURL;
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -95,12 +98,30 @@ public class PhotoViewActivity extends AppCompatActivity {
         }
     };
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.share_photo, menu);
+        return true;
+    }
+
+    public void shareCat(){
+        String shareText = "Check out this awesome cat from RateCatz! " + mURL;//need to add cat URL To share here
+        ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(shareText)
+                .setChooserTitle(R.string.share_chooser_title)
+                .startChooser();
+    }
+
     private ViewPager mPager;
     private CatPhotoPagerAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         setContentView(R.layout.activity_photo_view);
         ActionBar actionBar = getSupportActionBar();
@@ -125,6 +146,7 @@ public class PhotoViewActivity extends AppCompatActivity {
         mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
 
+
         Intent intent = getIntent();
         if(intent != null && intent.hasExtra(EXTRA_PHOTOS)) {
             Log.d("TEST", "LOG: in if");
@@ -132,6 +154,7 @@ public class PhotoViewActivity extends AppCompatActivity {
                     (ArrayList<CatUtils.CatPhoto>)intent.getSerializableExtra(EXTRA_PHOTOS);
             mAdapter.updatePhotos(photos);
             mPager.setCurrentItem(intent.getIntExtra(EXTRA_PHOTO_IDX, 0));
+            mURL= photos.toString();
             Log.d("TEST", "LOG: end of if");
         }
 
@@ -158,6 +181,8 @@ public class PhotoViewActivity extends AppCompatActivity {
             // This ID represents the Home or Up button.
             NavUtils.navigateUpFromSameTask(this);
             return true;
+        } else if (id == R.id.action_share) {
+            shareCat();
         }
         return super.onOptionsItemSelected(item);
     }

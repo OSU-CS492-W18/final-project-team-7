@@ -11,6 +11,8 @@ import java.util.List;
 
 /**
  * Created by gonzo on 3/17/2018.
+ *
+ * Fragment for prefs
  */
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
