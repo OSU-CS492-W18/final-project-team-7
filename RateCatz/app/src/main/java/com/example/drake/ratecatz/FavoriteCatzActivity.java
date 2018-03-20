@@ -1,12 +1,14 @@
 package com.example.drake.ratecatz;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -51,43 +53,12 @@ public class FavoriteCatzActivity extends AppCompatActivity
         mPhotosRV.setHasFixedSize(true);
         mPhotosRV.setLayoutManager(new StaggeredGridLayoutManager(NUM_PHOTO_COLUMNS, StaggeredGridLayoutManager.VERTICAL));
 
-        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
-        //getSupportLoaderManager().initLoader(CAT_LOADER_ID, null, this);
-
         mPhotos = getAllFavoritedCatz();
         mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
         for(CatUtils.CatPhoto photo : mPhotos) {
             Log.d(TAG, "Got photo: " + photo.url);
         }
     }
-
-    /*public Loader<String> onCreateLoader(int id, Bundle args) {
-        return new FavoriteCatzLoader(this);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
-        mLoadingIndicatorPB.setVisibility(View.INVISIBLE);
-        if(data != null) {
-            mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
-            mPhotosRV.setVisibility(View.VISIBLE);
-            mPhotos = getAllFavoritedCatz();
-
-            //Convert ArrayList<CatUtils.CatPhoto> to CatUtils.CatPhoto[]
-            mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
-            for(CatUtils.CatPhoto photo : mPhotos) {
-                Log.d(TAG, "Got photo: " + photo.url);
-            }
-        } else {
-            mPhotosRV.setVisibility(View.INVISIBLE);
-            mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<String> loader) {
-        //Nothing
-    }*/
 
     @Override
     public void onPhotoItemClicked(int photoIdx) {

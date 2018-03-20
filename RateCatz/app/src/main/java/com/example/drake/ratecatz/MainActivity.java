@@ -10,14 +10,17 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.ListPreference;
@@ -53,8 +56,8 @@ import junit.framework.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
-
+public class MainActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<String> {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CAT_LOADER_ID = 1;
     private static final String CAT_URL_KEY = "catUrl";
@@ -88,32 +91,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mCatOverlayOneIV = (ImageView)findViewById(R.id.iv_cat_overlay_one);
         mCatOverlayTwoIV = (ImageView)findViewById(R.id.iv_cat_overlay_two);
 
-//        mCatPhotoOneImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onCatPhotoClicked();
-//            }
-//        });
-
-//        mCatPhotoTwoImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onCatPhotoClicked();
-//            }
-//        });
-
         CatDBHelper dbWriteHelper = new CatDBHelper(this);
         CatDBHelper dbReadHelper = new CatDBHelper(this);
         mDBW = dbWriteHelper.getWritableDatabase();
         mDBR = dbReadHelper.getReadableDatabase();
-
-
-//        mAllFavoritedCats = getAllCats();
-//        Log.d(TAG, "List of favorited cats in db: \n" );
-//        for (int i=0;i<mAllFavoritedCats.size();i++)
-//        {
-//            Log.d(TAG,mAllFavoritedCats.get(i) + " onCreate()" );
-//        }
 
        mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
 

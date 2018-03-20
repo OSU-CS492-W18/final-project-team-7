@@ -77,23 +77,12 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
 
         public void bind(CatUtils.CatPhoto photo) {
             Glide.with(mPhotoIV.getContext()).load(photo.url).into(mPhotoIV);
-
-            //Rob's example with place holder:
-            /*
-            Glide.with(mPhotoIV.getContext())
-                    .load(photo.url_m)
-                    .apply(RequestOptions.placeholderOf(new SizedColorDrawable(Color.WHITE, photo.width_m, photo.height_m)))
-                    .into(mPhotoIV);
-            */
         }
 
         @Override
         public boolean onLongClick(View v) {
             //Log.v("long clicked","pos: " + getAdapterPosition());
             mOnPhotoItemLongClickedListener.onPhotoItemLongClicked(getAdapterPosition());
-
-//                    FavoriteCatzActivity.deleteCatFromFavorites(mPhotos[getAdapterPosition()].id);
-//                    Toast.makeText(itemView.getContext(), "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -102,28 +91,4 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
             mOnPhotoItemClickedListener.onPhotoItemClicked(getAdapterPosition());
         }
     }
-
-    //Class used with place holder
-    /*
-    class SizedColorDrawable extends ColorDrawable {
-        int mWidth = -1;
-        int mHeight = -1;
-
-        public SizedColorDrawable(int color, int width, int height) {
-            super(color);
-            mWidth = width;
-            mHeight = height;
-        }
-
-        @Override
-        public int getIntrinsicWidth() {
-            return mWidth;
-        }
-
-        @Override
-        public int getIntrinsicHeight() {
-            return mHeight;
-        }
-    }
-    */
 }

@@ -18,10 +18,7 @@ import java.util.List;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-       /* if (key.equals("pref_tag")) {
-            ListPreference tagPref = (ListPreference)findPreference(key);
-            tagPref.setValue(tagPref.getText());
-        }*/
+        //Nothing in here
     }
      //adjust things if necessary
     //**themes can only change on activity start**

@@ -4,9 +4,7 @@
         android:key="pref_theme"
         android:title="@string/pref_theme_title"
         android:summary="%s"
-        android:defaultValue="Black Cat"
-        android:entries="@array/pref_themes"
-        android:entryValues="@array/pref_themes"/>
+        android:defaultValue="Black Cat" />
     <ListPreference
         android:key="pref_tag"
         android:title="@string/pref_tag_title"
