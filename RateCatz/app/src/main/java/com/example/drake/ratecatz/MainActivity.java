@@ -227,7 +227,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if(!checkIfInFavorites(mCatPhotos.get(photoID).id)) {
             Drawable drawable = getResources().getDrawable(R.drawable.ic_favorite_overlay);
-            Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
+            Toast.makeText(catImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
             addCatToDB(mCatPhotos.get(photoID));
 
             catOverlay.setMinimumWidth(catImageView.getWidth());
@@ -236,7 +237,8 @@ public class MainActivity extends AppCompatActivity implements
             catOverlay.bringToFront();
 
         } else {
-            Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
+            Toast.makeText(catImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
             deleteCatFromFavorites(mCatPhotos.get(photoID).id);
 
             catOverlay.setVisibility(View.INVISIBLE);
