@@ -48,6 +48,10 @@ public class FavoriteCatzActivity extends AppCompatActivity
         mPhotosRV.setHasFixedSize(true);
         mPhotosRV.setLayoutManager(new StaggeredGridLayoutManager(NUM_PHOTO_COLUMNS, StaggeredGridLayoutManager.VERTICAL));
 
+        printPhotos();
+    }
+
+    private void printPhotos() {
         mPhotos = getAllFavoritedCatz();
         mAdapter.updatePhotos(mPhotos.toArray(new CatUtils.CatPhoto[mPhotos.size()]));
         for(CatUtils.CatPhoto photo : mPhotos) {
@@ -91,26 +95,23 @@ public class FavoriteCatzActivity extends AppCompatActivity
     public void deleteCatFromFavorites() {
         CatDBHelper dbHelper = new CatDBHelper(this);
         mDB = dbHelper.getReadableDatabase();
+
+        //Delete photo
         if(mDeleteCatId != null) {
             String sqlSelection = CatContract.FavoritedCats.COLUMN_CAT_ID + " = ?";
             String[] sqlSelectionArgs = {mDeleteCatId};
             mDB.delete(CatContract.FavoritedCats.TABLE_NAME, sqlSelection, sqlSelectionArgs);
         }
-
         Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
+
+        //Print updated list
+        printPhotos();
     }
 
     @Override
     public void onPhotoItemLongClicked(int photo) {
         showDialog(this, "Are you sure you want to delete such a pretty kitty?");
         mDeleteCatId = mPhotos.get(photo).id;
-        /*if(mDeleteCat) {
-            Log.d("test", "LOG: in if statement");
-            Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
-            deleteCatFromFavorites(mPhotos.get(photo).id);
-            mDeleteCat = false;
-        }*/
-        Log.d("test", "LOG: after if statement");
     }
 
     public void showDialog(Activity activity, String title) {

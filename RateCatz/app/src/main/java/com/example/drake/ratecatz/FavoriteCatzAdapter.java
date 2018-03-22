@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,7 @@ public class FavoriteCatzAdapter extends RecyclerView.Adapter<FavoriteCatzAdapte
 
         public CatPhotoViewHolder(View itemView) {
             super(itemView);
-            mPhotoIV = itemView.findViewById(R.id.iv_cat_photo); //TODO verify this is correct
+            mPhotoIV = itemView.findViewById(R.id.iv_cat_photo);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
