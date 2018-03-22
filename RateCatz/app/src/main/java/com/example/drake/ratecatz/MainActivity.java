@@ -192,26 +192,32 @@ public class MainActivity extends AppCompatActivity implements
         animationOverlay.setDuration(140);
         animatorSet.play(animation).with(animationOverlay);
 
-        animatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
-                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
-                mCatPhotoOneImageView.clearAnimation();
-                mCatPhotoTwoImageView.clearAnimation();
-                mCatOverlayOneIV.clearAnimation();
-                mCatOverlayTwoIV.clearAnimation();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                    mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                    mCatPhotoOneImageView.clearAnimation();
+                    mCatPhotoTwoImageView.clearAnimation();
+                    mCatOverlayOneIV.clearAnimation();
+                    mCatOverlayTwoIV.clearAnimation();
 
-                animation.removeListener(this);
-                animation.setDuration(0);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    animation.removeListener(this);
+                    animation.setDuration(0);
+                    //TODO: Find out how to handle Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    //TODO: Different Swiping feature?
+                    //TODO: Single Click?
+                    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ((AnimatorSet) animation).reverse();
+                    }*/
                     ((AnimatorSet) animation).reverse();
-                }
-                animation.cancel();
+                    animation.cancel();
 
-                doCatGetImageRequest(false);
-            }
-        });
+                    doCatGetImageRequest(false);
+                }
+            });
+        }
         animatorSet.start();
     }
 

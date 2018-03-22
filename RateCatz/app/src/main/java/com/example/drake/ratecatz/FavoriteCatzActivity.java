@@ -1,5 +1,8 @@
 package com.example.drake.ratecatz;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -37,6 +40,8 @@ public class FavoriteCatzActivity extends AppCompatActivity
     private ArrayList<CatUtils.CatPhoto> mPhotos;
 
     private SQLiteDatabase mDB;
+    //private boolean mDeleteCat = false;
+    String mDeleteCatId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,19 +98,47 @@ public class FavoriteCatzActivity extends AppCompatActivity
         return allFavoritedCatz;
     }
 
-    public void deleteCatFromFavorites(String id) {
+    public void deleteCatFromFavorites() {
         CatDBHelper dbHelper = new CatDBHelper(this);
         mDB = dbHelper.getReadableDatabase();
-        if(id != null) {
+        if(mDeleteCatId != null) {
             String sqlSelection = CatContract.FavoritedCats.COLUMN_CAT_ID + " = ?";
-            String[] sqlSelectionArgs = {id};
+            String[] sqlSelectionArgs = {mDeleteCatId};
             mDB.delete(CatContract.FavoritedCats.TABLE_NAME, sqlSelection, sqlSelectionArgs);
         }
+
+        Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPhotoItemLongClicked(int photo) {
-        Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
-        deleteCatFromFavorites(mPhotos.get(photo).id);
+        //Log.d("test", "LOG: mDeleteCat = " + mDeleteCat);
+        showDialog(this, "Are you sure you want to delete such a pretty kitty?");
+        //Log.d("test", "LOG: mDeleteCat = " + mDeleteCat);
+        mDeleteCatId = mPhotos.get(photo).id;
+        /*if(mDeleteCat) {
+            Log.d("test", "LOG: in if statement");
+            Toast.makeText(this, "Removed cat from favorites ", Toast.LENGTH_SHORT).show();
+            deleteCatFromFavorites(mPhotos.get(photo).id);
+            mDeleteCat = false;
+        }*/
+        Log.d("test", "LOG: after if statement");
+    }
+
+    public void showDialog(Activity activity, String title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+
+        if(title != null)
+            builder.setTitle(title);
+
+        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //mDeleteCat = true;
+                deleteCatFromFavorites();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 }
