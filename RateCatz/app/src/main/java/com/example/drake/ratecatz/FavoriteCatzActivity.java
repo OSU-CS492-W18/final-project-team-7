@@ -120,7 +120,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
         if(title != null)
             builder.setTitle(title);
 
-        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 deleteCatFromFavorites();
