@@ -4,18 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +19,9 @@ import com.example.drake.ratecatz.utils.CatUtils;
 import java.util.ArrayList;
 
 public class FavoriteCatzActivity extends AppCompatActivity
-        //implements LoaderManager.LoaderCallbacks<String>,
         implements FavoriteCatzAdapter.OnPhotoItemClickedListener, FavoriteCatzAdapter.OnPhotoItemLongClickedListener {
 
     private static final String TAG = FavoriteCatzActivity.class.getSimpleName();
-    //private static final int CAT_LOADER_ID = 0;
     private static final int NUM_PHOTO_COLUMNS = 2;
 
     private RecyclerView mPhotosRV;
@@ -36,11 +29,9 @@ public class FavoriteCatzActivity extends AppCompatActivity
     private TextView mLoadingErrorMessageTV;
     private FavoriteCatzAdapter mAdapter;
 
-    //private CatUtils.CatPhoto[] mPhotos;
     private ArrayList<CatUtils.CatPhoto> mPhotos;
 
     private SQLiteDatabase mDB;
-    //private boolean mDeleteCat = false;
     String mDeleteCatId;
 
     @Override
@@ -48,7 +39,6 @@ public class FavoriteCatzActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_catz);
 
-        //mLoadingIndicatorPB = (ProgressBar)findViewById(R.id.pb_loading_indicator);
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error_message);
         mPhotosRV = (RecyclerView)findViewById(R.id.rv_photos);
 
@@ -112,9 +102,7 @@ public class FavoriteCatzActivity extends AppCompatActivity
 
     @Override
     public void onPhotoItemLongClicked(int photo) {
-        //Log.d("test", "LOG: mDeleteCat = " + mDeleteCat);
         showDialog(this, "Are you sure you want to delete such a pretty kitty?");
-        //Log.d("test", "LOG: mDeleteCat = " + mDeleteCat);
         mDeleteCatId = mPhotos.get(photo).id;
         /*if(mDeleteCat) {
             Log.d("test", "LOG: in if statement");
@@ -134,7 +122,6 @@ public class FavoriteCatzActivity extends AppCompatActivity
         builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //mDeleteCat = true;
                 deleteCatFromFavorites();
             }
         });
