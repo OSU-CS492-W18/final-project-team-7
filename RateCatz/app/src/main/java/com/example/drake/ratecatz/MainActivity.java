@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -85,6 +86,13 @@ public class MainActivity extends AppCompatActivity implements
     //TESTING
     //boolean isOldVersion = true;
 
+    /**
+    SuppressLint(...) gets rid of warnings concerning setOnTouchListener and the lack of
+    implementing performClick(). The warning is there due to audible feedback for the blind
+    but seeing as this app's entire concept is based on something visual there is no use in
+    implementing it.
+    */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,14 +112,13 @@ public class MainActivity extends AppCompatActivity implements
         mDBW = dbWriteHelper.getWritableDatabase();
         mDBR = dbReadHelper.getReadableDatabase();
 
+        //Listener for top cat
         mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
                 gestureDetector.onTouchEvent(event);
-                //doCatGetImageRequest();
-                //TODO v.performClick(); ???
                 return true;
             }
 
@@ -145,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
 
         });
 
-
+        //Listener for bottom cat
         mCatPhotoTwoImageView.setOnTouchListener(new OnTouchListener() {
 
             @Override
@@ -187,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         doCatGetImageRequest(true);
-
     }
 
     //Swipe feature will only work for devices running Android API version 26 or newer
@@ -205,25 +211,25 @@ public class MainActivity extends AppCompatActivity implements
         animationOverlay.setDuration(140);
         animatorSet.play(animation).with(animationOverlay);
 
-            animatorSet.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mCatOverlayOneIV.setVisibility(View.INVISIBLE);
-                    mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
-                    mCatPhotoOneImageView.clearAnimation();
-                    mCatPhotoTwoImageView.clearAnimation();
-                    mCatOverlayOneIV.clearAnimation();
-                    mCatOverlayTwoIV.clearAnimation();
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                mCatPhotoOneImageView.clearAnimation();
+                mCatPhotoTwoImageView.clearAnimation();
+                mCatOverlayOneIV.clearAnimation();
+                mCatOverlayTwoIV.clearAnimation();
 
-                    animation.removeListener(this);
-                    animation.setDuration(0);
-                    ((AnimatorSet) animation).reverse();
-                    animation.cancel();
+                animation.removeListener(this);
+                animation.setDuration(0);
+                ((AnimatorSet) animation).reverse();
+                animation.cancel();
 
-                    doCatGetImageRequest(false);
-                }
-            });
-            animatorSet.start();
+                doCatGetImageRequest(false);
+            }
+        });
+        animatorSet.start();
     }
 
     //Android devices running API version 25 or older will react to clicking instead of swiping
@@ -242,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements
 
                 animation.removeListener(this);
                 animation.setDuration(0);
-                //((AnimatorSet) animation).reverse();
                 animation.cancel();
 
                 doCatGetImageRequest(false);
@@ -257,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements
 
         if(!checkIfInFavorites(mCatPhotos.get(photoID).id)) {
             Drawable drawable = getResources().getDrawable(R.drawable.ic_favorite_overlay);
-            //Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
             Toast.makeText(catImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
             addCatToDB(mCatPhotos.get(photoID));
 
@@ -267,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements
             catOverlay.bringToFront();
 
         } else {
-            //Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
             Toast.makeText(catImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
             deleteCatFromFavorites(mCatPhotos.get(photoID).id);
 
@@ -311,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //get user's tag pref here
-
         String pref_tag;
         pref_tag= sharedPreferences.getString("pref_tag", "none");
 
