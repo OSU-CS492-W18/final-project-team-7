@@ -5,6 +5,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,6 +15,7 @@ import android.content.Loader;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -77,6 +80,19 @@ public class MainActivity extends AppCompatActivity implements
     private SQLiteDatabase mDBR;
     private ArrayList<String> mAllFavoritedCats;
 
+    //If SDK Version is 26 or greater, swipe to select cat. Else tap to select cat
+    boolean isOldVersion = (Build.VERSION.SDK_INT < Build.VERSION_CODES.O);
+
+    //TESTING
+    //boolean isOldVersion = true;
+
+    /**
+    SuppressLint(...) gets rid of warnings concerning setOnTouchListener and the lack of
+    implementing performClick(). The warning is there due to audible feedback for the blind
+    but seeing as this app's entire concept is based on something visual there is no use in
+    implementing it.
+    */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,53 +112,54 @@ public class MainActivity extends AppCompatActivity implements
         mDBW = dbWriteHelper.getWritableDatabase();
         mDBR = dbReadHelper.getReadableDatabase();
 
-       mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
+        //Listener for top cat
+        mCatPhotoOneImageView.setOnTouchListener(new OnTouchListener() {
 
-           @Override
-           public boolean onTouch(View v, MotionEvent event) {
-               Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
-               gestureDetector.onTouchEvent(event);
-               //doCatGetImageRequest();
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
 
-               return true;
-           }
+            private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    Log.d("TEST", "onDoubleTap");
+                    onCatFavorite(0);
+                    return super.onDoubleTap(e);
+                }
 
-           private GestureDetector gestureDetector = new GestureDetector(getBaseContext(), new GestureDetector.SimpleOnGestureListener() {
-               @Override
-               public boolean onDoubleTap(MotionEvent e) {
-                   Log.d("TEST", "onDoubleTap");
-                   onCatFavorite(0);
-                   return super.onDoubleTap(e);
-               }
+                @Override
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                    if(!isOldVersion)
+                        onCatPhotoSwiped(0, velocityX);
+                    return super.onFling(e1, e2, velocityX, velocityY);
+                }
 
-               @Override
-               public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                   onCatPhotoClicked(0, velocityX);
-                   return super.onFling(e1, e2, velocityX, velocityY);
-               }
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return super.onSingleTapUp(e);
+                }
 
-               @Override
-               public boolean onSingleTapUp(MotionEvent e) {
-                   return super.onSingleTapUp(e);
-               }
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    if(isOldVersion)
+                        onCatPhotoClicked();
+                    return super.onSingleTapConfirmed(e);
+                }
+            });
 
-               @Override
-               public boolean onSingleTapConfirmed(MotionEvent e) {
-                 //  onCatPhotoClicked();
-                   return super.onSingleTapConfirmed(e);
-               }
-           });
+        });
 
-       });
-
-
+        //Listener for bottom cat
         mCatPhotoTwoImageView.setOnTouchListener(new OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
                 gestureDetector.onTouchEvent(event);
-                
+
                 return true;
             }
 
@@ -156,7 +173,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    onCatPhotoClicked(1, velocityX);
+                    if(!isOldVersion)
+                        onCatPhotoSwiped(1, velocityX);
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
 
@@ -167,7 +185,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    //
+                    if(isOldVersion)
+                        onCatPhotoClicked();
                     return super.onSingleTapConfirmed(e);
                 }
             });
@@ -175,16 +194,16 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         doCatGetImageRequest(true);
-
     }
 
-    public void onCatPhotoClicked(int photoID, float velocity) {
-        ImageView imageChosen = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
-        ImageView overlayChosen = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
-        float distance = (velocity > 0)?1400f:-1400f;
+    //Swipe feature will only work for devices running Android API version 26 or newer
+    @TargetApi(26)
+    public void onCatPhotoSwiped(int photoID, float velocity) {
+        ImageView imageChosen = (photoID == 0) ? mCatPhotoOneImageView : mCatPhotoTwoImageView;
+        ImageView overlayChosen = (photoID == 0) ? mCatOverlayOneIV : mCatOverlayTwoIV;
+        float distance = (velocity > 0) ? 1400f : -1400f;
 
         final AnimatorSet animatorSet = new AnimatorSet();
-
 
         ObjectAnimator animation = ObjectAnimator.ofFloat(imageChosen, "translationX", distance);
         animation.setDuration(140);
@@ -192,42 +211,57 @@ public class MainActivity extends AppCompatActivity implements
         animationOverlay.setDuration(140);
         animatorSet.play(animation).with(animationOverlay);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            animatorSet.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mCatOverlayOneIV.setVisibility(View.INVISIBLE);
-                    mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
-                    mCatPhotoOneImageView.clearAnimation();
-                    mCatPhotoTwoImageView.clearAnimation();
-                    mCatOverlayOneIV.clearAnimation();
-                    mCatOverlayTwoIV.clearAnimation();
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                mCatPhotoOneImageView.clearAnimation();
+                mCatPhotoTwoImageView.clearAnimation();
+                mCatOverlayOneIV.clearAnimation();
+                mCatOverlayTwoIV.clearAnimation();
 
-                    animation.removeListener(this);
-                    animation.setDuration(0);
-                    //TODO: Find out how to handle Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                    //TODO: Different Swiping feature?
-                    //TODO: Single Click?
-                    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        ((AnimatorSet) animation).reverse();
-                    }*/
-                    ((AnimatorSet) animation).reverse();
-                    animation.cancel();
+                animation.removeListener(this);
+                animation.setDuration(0);
+                ((AnimatorSet) animation).reverse();
+                animation.cancel();
 
-                    doCatGetImageRequest(false);
-                }
-            });
-        }
+                doCatGetImageRequest(false);
+            }
+        });
         animatorSet.start();
     }
 
-    public void onCatFavorite(int photoID){
-        ImageView catImageView = (photoID == 0)?mCatPhotoOneImageView:mCatPhotoTwoImageView;
-        ImageView catOverlay = (photoID == 0)?mCatOverlayOneIV:mCatOverlayTwoIV;
+    //Android devices running API version 25 or older will react to clicking instead of swiping
+    public void onCatPhotoClicked() {
+        final AnimatorSet animatorSet = new AnimatorSet();
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mCatOverlayOneIV.setVisibility(View.INVISIBLE);
+                mCatOverlayTwoIV.setVisibility(View.INVISIBLE);
+                mCatPhotoOneImageView.clearAnimation();
+                mCatPhotoTwoImageView.clearAnimation();
+                mCatOverlayOneIV.clearAnimation();
+                mCatOverlayTwoIV.clearAnimation();
+
+                animation.removeListener(this);
+                animation.setDuration(0);
+                animation.cancel();
+
+                doCatGetImageRequest(false);
+            }
+        });
+        animatorSet.start();
+    }
+
+    public void onCatFavorite(int photoID) {
+        ImageView catImageView = (photoID == 0) ? mCatPhotoOneImageView : mCatPhotoTwoImageView;
+        ImageView catOverlay = (photoID == 0) ? mCatOverlayOneIV : mCatOverlayTwoIV;
 
         if(!checkIfInFavorites(mCatPhotos.get(photoID).id)) {
             Drawable drawable = getResources().getDrawable(R.drawable.ic_favorite_overlay);
-            //Toast.makeText(catImageView.getContext(), "Added " + (photoID==0?"first":"second") + " cat to favorites", Toast.LENGTH_SHORT).show();
             Toast.makeText(catImageView.getContext(), "Added cat to favorites", Toast.LENGTH_SHORT).show();
             addCatToDB(mCatPhotos.get(photoID));
 
@@ -237,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements
             catOverlay.bringToFront();
 
         } else {
-            //Toast.makeText(catImageView.getContext(), "Removed " + (photoID==0?"first":"second") + " cat from favorites", Toast.LENGTH_SHORT).show();
             Toast.makeText(catImageView.getContext(), "Removed cat from favorites", Toast.LENGTH_SHORT).show();
             deleteCatFromFavorites(mCatPhotos.get(photoID).id);
 
@@ -281,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //get user's tag pref here
-
         String pref_tag;
         pref_tag= sharedPreferences.getString("pref_tag", "none");
 
